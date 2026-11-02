@@ -1,196 +1,725 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Job Link Tracker</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<style>
-:root{--bg:#eef1f4;--surface:#fff;--ink:#17212b;--muted:#5d6b7a;--line:#cfd6de;--head:#e2e8ee;--accent:#1d4ed8;--accent-ink:#fff;--ok:#157347;--warn:#b45309;--bad:#b42318}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#10151b;--surface:#18202a;--ink:#e6ebf0;--muted:#93a1b0;--line:#2b3644;--head:#212c38;--accent:#6c93ff;--accent-ink:#0b1220;--ok:#4cc38a;--warn:#f0a04b;--bad:#ff7a70}}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,Segoe UI,Arial,sans-serif;padding:24px 16px 48px}
-.wrap{max-width:1100px;margin:0 auto}
-h1{font-size:26px;margin:0 0 4px;font-weight:600;letter-spacing:-.01em}
-.sub{color:var(--muted);margin:0 0 20px;max-width:60ch}
-form{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px;display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end}
-label{display:block;font-size:13px;color:var(--muted);margin-bottom:3px}
-input,select{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:8px 10px}
-input:focus,select:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.notes{grid-column:1/-1}
-button{font:inherit;cursor:pointer;border-radius:4px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px}
-button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:500}
-button.danger{color:var(--bad)}
-button:disabled{opacity:.5;cursor:not-allowed}
-.msg{grid-column:1/-1;min-height:20px;font-size:13px;color:var(--bad)}
-.msg.ok{color:var(--ok)}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:20px 0 10px}
-.bar .count{margin-right:auto;color:var(--muted)}
-.bar input{width:200px}
-.sheet{background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow-x:auto}
-table{border-collapse:collapse;width:100%;min-width:820px}
-th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
-thead th{background:var(--head);font-weight:600;font-size:13px;position:sticky;top:0}
-tbody tr:first-child td,thead th{border-top:0}
-tr>*:first-child{border-left:0}tr>*:last-child{border-right:0}
-td.n{color:var(--muted);width:44px;text-align:right}
-td a{color:var(--accent);word-break:break-all}
-td select{padding:4px 6px;width:auto}
-.exp{white-space:nowrap}.exp.soon{color:var(--warn);font-weight:500}
-.empty{padding:36px 16px;text-align:center;color:var(--muted)}
-.note{color:var(--muted);font-size:13px;margin-top:12px}
-@media(max-width:720px){form{grid-template-columns:1fr}.bar input{width:100%}}
-@media print{.bar,form,.note{display:none}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Job Link Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <style>
+         :root {
+            --bg: #eef1f4;
+            --surface: #fff;
+            --ink: #17212b;
+            --muted: #5d6b7a;
+            --line: #cfd6de;
+            --head: #e2e8ee;
+            --accent: #1d4ed8;
+            --accent-ink: #fff;
+            --ok: #157347;
+            --warn: #b45309;
+            --bad: #b42318
+        }
+        
+        @media (prefers-color-scheme:dark) {
+            :root:not([data-theme=light]) {
+                --bg: #10151b;
+                --surface: #18202a;
+                --ink: #e6ebf0;
+                --muted: #93a1b0;
+                --line: #2b3644;
+                --head: #212c38;
+                --accent: #6c93ff;
+                --accent-ink: #0b1220;
+                --ok: #4cc38a;
+                --warn: #f0a04b;
+                --bad: #ff7a70
+            }
+        }
+        
+        * {
+            box-sizing: border-box
+        }
+        
+        html,
+        body {
+            margin: 0
+        }
+        
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font: 15px/1.5 "IBM Plex Sans", system-ui, Segoe UI, Arial, sans-serif;
+            padding: 24px 16px 48px
+        }
+        
+        .wrap {
+            max-width: 1100px;
+            margin: 0 auto
+        }
+        
+        h1 {
+            font-size: 26px;
+            margin: 0 0 4px;
+            font-weight: 600;
+            letter-spacing: -.01em
+        }
+        
+        .sub {
+            color: var(--muted);
+            margin: 0 0 20px;
+            max-width: 60ch
+        }
+        
+        form {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 14px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: end
+        }
+        
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 3px
+        }
+        
+        input,
+        select {
+            width: 100%;
+            font: inherit;
+            color: var(--ink);
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            padding: 8px 10px
+        }
+        
+        input:focus,
+        select:focus,
+        button:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 1px
+        }
+        
+        .notes {
+            grid-column: 1/-1
+        }
+        
+        button {
+            font: inherit;
+            cursor: pointer;
+            border-radius: 4px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--ink);
+            padding: 8px 14px
+        }
+        
+        button.primary {
+            background: var(--accent);
+            color: var(--accent-ink);
+            border-color: var(--accent);
+            font-weight: 500
+        }
+        
+        button.danger {
+            color: var(--bad)
+        }
+        
+        button:disabled {
+            opacity: .5;
+            cursor: not-allowed
+        }
+        
+        .msg {
+            grid-column: 1/-1;
+            min-height: 20px;
+            font-size: 13px;
+            color: var(--bad)
+        }
+        
+        .msg.ok {
+            color: var(--ok)
+        }
+        
+        .msg a {
+            color: var(--accent)
+        }
+        
+        .bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin: 20px 0 6px
+        }
+        
+        .bar .count {
+            margin-right: auto;
+            color: var(--muted)
+        }
+        
+        .bar input {
+            width: 200px
+        }
+        
+        .barmsg {
+            min-height: 20px;
+            margin: 0 0 8px;
+            font-size: 13px;
+            color: var(--bad)
+        }
+        
+        .barmsg.ok {
+            color: var(--ok)
+        }
+        
+        .barmsg a {
+            color: var(--accent)
+        }
+        
+        .sheet {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            overflow-x: auto
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 820px
+        }
+        
+        th,
+        td {
+            border: 1px solid var(--line);
+            padding: 8px 10px;
+            text-align: left;
+            vertical-align: top
+        }
+        
+        thead th {
+            background: var(--head);
+            font-weight: 600;
+            font-size: 13px;
+            position: sticky;
+            top: 0
+        }
+        
+        tbody tr:first-child td,
+        thead th {
+            border-top: 0
+        }
+        
+        tr>*:first-child {
+            border-left: 0
+        }
+        
+        tr>*:last-child {
+            border-right: 0
+        }
+        
+        td.n {
+            color: var(--muted);
+            width: 44px;
+            text-align: right
+        }
+        
+        td a {
+            color: var(--accent);
+            word-break: break-all
+        }
+        
+        td select {
+            padding: 4px 6px;
+            width: auto
+        }
+        
+        .exp {
+            white-space: nowrap
+        }
+        
+        .exp.soon {
+            color: var(--warn);
+            font-weight: 500
+        }
+        
+        .empty {
+            padding: 36px 16px;
+            text-align: center;
+            color: var(--muted)
+        }
+        
+        .note {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 12px
+        }
+        
+        @media(max-width:720px) {
+            form {
+                grid-template-columns: 1fr
+            }
+            .bar input {
+                width: 100%
+            }
+        }
+        
+        @media print {
+            .bar,
+            .barmsg,
+            form,
+            .note {
+                display: none
+            }
+        }
+    </style>
 </head>
+
 <body>
-<div class="wrap">
-  <h1>Job Link Tracker</h1>
-  <p class="sub">Paste a job application link whenever you find one. Links stay saved in this browser for 48 hours; download them as Excel or PDF before they expire.</p>
+    <div class="wrap">
+        <h1>Job Link Tracker</h1>
+        <p class="sub">Paste a job application link whenever you find one. Links stay saved in this browser for 48 hours; download them as Excel or PDF before they expire.</p>
 
-  <form id="f" autocomplete="off">
-    <div><label for="link">Job link</label><input id="link" type="text" placeholder="https://company.com/careers/ml-engineer" required></div>
-    <div><label for="company">Company (optional)</label><input id="company" type="text" placeholder="Filled from the link if empty"></div>
-    <div><label for="role">Role (optional)</label><input id="role" type="text" placeholder="ML Engineer Intern"></div>
-    <button class="primary" type="submit">Save link</button>
-    <div class="notes"><label for="notes">Notes (optional)</label><input id="notes" type="text" placeholder="Deadline, referral, resume version..."></div>
-    <div class="msg" id="msg" role="status"></div>
-  </form>
+        <form id="f" autocomplete="off">
+            <div><label for="link">Job link</label><input id="link" type="text" placeholder="https://company.com/careers/ml-engineer" required></div>
+            <div><label for="company">Company (optional)</label><input id="company" type="text" placeholder="Filled from the link if empty"></div>
+            <div><label for="role">Role (optional)</label><input id="role" type="text" placeholder="ML Engineer Intern"></div>
+            <button class="primary" type="submit">Save link</button>
+            <div class="notes"><label for="notes">Notes (optional)</label><input id="notes" type="text" placeholder="Deadline, referral, resume version..."></div>
+            <div class="msg" id="msg" role="status"></div>
+        </form>
 
-  <div class="bar">
-    <span class="count" id="count"></span>
-    <input id="q" type="search" placeholder="Search saved links" aria-label="Search saved links">
-    <button id="xl">Download Excel</button>
-    <button id="pdf">Download PDF</button>
-    <button id="clr" class="danger">Clear all</button>
-  </div>
+        <div class="bar">
+            <span class="count" id="count"></span>
+            <input id="q" type="search" placeholder="Search saved links" aria-label="Search saved links">
+            <button id="xl">Download Excel</button>
+            <button id="pdf">Download PDF</button>
+            <button id="clr" class="danger">Clear all</button>
+        </div>
+        <div class="barmsg" id="barmsg" role="status" aria-live="polite"></div>
 
-  <div class="sheet">
-    <table>
-      <thead><tr><th>#</th><th>Added</th><th>Company</th><th>Role</th><th>Link</th><th>Status</th><th>Notes</th><th>Expires in</th><th></th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
-    <div class="empty" id="empty" hidden>Nothing saved yet. Paste your first job link above.</div>
-  </div>
-  <p class="note">Saved only in this browser on this device. Entries are deleted automatically 48 hours after you add them.</p>
-</div>
+        <div class="sheet">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Added</th>
+                        <th>Company</th>
+                        <th>Role</th>
+                        <th>Link</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                        <th>Expires in</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+            </table>
+            <div class="empty" id="empty" hidden>Nothing saved yet. Paste your first job link above.</div>
+        </div>
+        <p class="note">Saved only in this browser on this device. Entries are deleted automatically 48 hours after you add them.</p>
+    </div>
 
-<script>
-const KEY='jobLinkTracker.v1', TTL=48*60*60*1000, STATUSES=['Saved','Applied','Interview','Offer','Rejected'];
-const $=id=>document.getElementById(id);
-let items=load();
+    <script>
+        const KEY = 'jobLinkTracker.v1',
+            TTL = 48 * 60 * 60 * 1000,
+            STATUSES = ['Saved', 'Applied', 'Interview', 'Offer', 'Rejected'];
+        const $ = id => document.getElementById(id);
+        let items = load();
 
-function load(){
-  try{
-    const all=JSON.parse(localStorage.getItem(KEY)||'[]');
-    const live=all.filter(i=>i.added+TTL>Date.now());
-    if(live.length!==all.length) localStorage.setItem(KEY,JSON.stringify(live));
-    return live;
-  }catch(e){return []}
-}
-function save(){
-  try{localStorage.setItem(KEY,JSON.stringify(items))}
-  catch(e){say('Could not save to browser storage. Download your list now.')}
-}
-function say(t,ok){const m=$('msg');m.textContent=t;m.className='msg'+(ok?' ok':'')}
-function normUrl(s){
-  s=s.trim(); if(!s) return null;
-  if(!/^https?:\/\//i.test(s)) s='https://'+s;
-  try{const u=new URL(s); return u.hostname.includes('.')?u.href:null}catch(e){return null}
-}
-function guessCompany(url){
-  const h=new URL(url).hostname.replace(/^www\./,'').split('.');
-  const hosts=['linkedin','indeed','naukri','glassdoor','internshala','wellfound','lever','greenhouse','workday','myworkdayjobs','ashbyhq','smartrecruiters'];
-  let name=h.length>2?h[h.length-3]:h[0];
-  if(h.length>=2 && hosts.includes(h[h.length-2])) name=h[h.length-2];
-  return name.charAt(0).toUpperCase()+name.slice(1);
-}
-function fmtDate(ms){return new Date(ms).toLocaleString([], {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}
-function left(i){
-  const ms=i.added+TTL-Date.now(); if(ms<=0) return 'expired';
-  const h=Math.floor(ms/36e5), m=Math.floor(ms%36e5/6e4);
-  return h+'h '+String(m).padStart(2,'0')+'m';
-}
+        function load() {
+            try {
+                const all = JSON.parse(localStorage.getItem(KEY) || '[]');
+                const live = all.filter(i => i.added + TTL > Date.now());
+                if (live.length !== all.length) localStorage.setItem(KEY, JSON.stringify(live));
+                return live;
+            } catch (e) {
+                return []
+            }
+        }
 
-$('f').addEventListener('submit',e=>{
-  e.preventDefault();
-  const url=normUrl($('link').value);
-  if(!url){say('Enter a valid link, for example https://company.com/careers/role');return}
-  if(items.some(i=>i.link===url)){say('This link is already saved.');return}
-  items.unshift({id:Date.now()+Math.random().toString(36).slice(2,6),link:url,
-    company:$('company').value.trim()||guessCompany(url),role:$('role').value.trim(),
-    notes:$('notes').value.trim(),status:'Saved',added:Date.now()});
-  save(); $('f').reset(); say('Link saved.',true); render(); $('link').focus();
-});
+        function save() {
+            try {
+                localStorage.setItem(KEY, JSON.stringify(items))
+            } catch (e) {
+                say('Could not save to browser storage. Download your list now.')
+            }
+        }
 
-function visible(){
-  const q=$('q').value.trim().toLowerCase();
-  return q?items.filter(i=>[i.company,i.role,i.link,i.notes,i.status].join(' ').toLowerCase().includes(q)):items;
-}
+        function say(t, ok) {
+            const m = $('msg');
+            m.textContent = t;
+            m.className = 'msg' + (ok ? ' ok' : '')
+        }
+        // Message shown right under the Download buttons so errors are never missed.
+        function barSay(t, ok, href, linkText) {
+            const m = $('barmsg');
+            m.textContent = t;
+            m.className = 'barmsg' + (ok ? ' ok' : '');
+            if (href) {
+                m.appendChild(document.createTextNode(' '));
+                const a = document.createElement('a');
+                a.href = href;
+                a.target = '_blank';
+                a.rel = 'noopener';
+                a.textContent = linkText;
+                m.appendChild(a)
+            }
+        }
 
-function render(){
-  items=items.filter(i=>i.added+TTL>Date.now());
-  const list=visible(), tb=$('rows'); tb.textContent='';
-  list.forEach((i,idx)=>{
-    const tr=document.createElement('tr');
-    const cell=(t,cls)=>{const td=document.createElement('td');if(cls)td.className=cls;td.textContent=t;tr.appendChild(td);return td};
-    cell(idx+1,'n'); cell(fmtDate(i.added)); cell(i.company); cell(i.role);
-    const lt=document.createElement('td'), a=document.createElement('a');
-    a.href=i.link;a.target='_blank';a.rel='noopener noreferrer';a.textContent=i.link;lt.appendChild(a);tr.appendChild(lt);
-    const st=document.createElement('td'), sel=document.createElement('select');
-    sel.setAttribute('aria-label','Status');
-    STATUSES.forEach(s=>{const o=document.createElement('option');o.textContent=s;o.selected=s===i.status;sel.appendChild(o)});
-    sel.onchange=()=>{i.status=sel.value;save()};
-    st.appendChild(sel);tr.appendChild(st);
-    cell(i.notes);
-    const ex=cell(left(i),'exp'); if(i.added+TTL-Date.now()<6*36e5) ex.classList.add('soon');
-    const dt=document.createElement('td'), b=document.createElement('button');
-    b.textContent='Delete';b.className='danger';
-    b.onclick=()=>{items=items.filter(x=>x.id!==i.id);save();render()};
-    dt.appendChild(b);tr.appendChild(dt);tb.appendChild(tr);
-  });
-  $('empty').hidden=list.length>0;
-  $('count').textContent=items.length+(items.length===1?' link saved':' links saved');
-  ['xl','pdf','clr'].forEach(id=>$(id).disabled=!items.length);
-}
-$('q').addEventListener('input',render);
+        function normUrl(s) {
+            s = s.trim();
+            if (!s) return null;
+            if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+            try {
+                const u = new URL(s);
+                // Unwrap LinkedIn redirect links so the saved link goes straight to the employer page.
+                if (/(^|\.)linkedin\.com$/.test(u.hostname) && u.pathname.startsWith('/safety/go')) {
+                    const t = u.searchParams.get('url');
+                    if (t) return normUrl(t);
+                }
+                return u.hostname.includes('.') ? u.href : null;
+            } catch (e) {
+                return null
+            }
+        }
 
-function stamp(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-const HEAD=['#','Date added','Company','Role','Link','Status','Notes'];
-function rowsOf(list){return list.map((i,n)=>[n+1,fmtDate(i.added),i.company,i.role,i.link,i.status,i.notes])}
+        function guessCompany(url) {
+            const h = new URL(url).hostname.replace(/^www\./, '').split('.');
+            const hosts = ['linkedin', 'indeed', 'naukri', 'glassdoor', 'internshala', 'wellfound', 'lever', 'greenhouse', 'workday', 'myworkdayjobs', 'ashbyhq', 'smartrecruiters'];
+            let name = h.length > 2 ? h[h.length - 3] : h[0];
+            if (h.length >= 2 && hosts.includes(h[h.length - 2])) name = h[h.length - 2];
+            return name.charAt(0).toUpperCase() + name.slice(1);
+        }
 
-$('xl').onclick=()=>{
-  if(typeof XLSX==='undefined'){say('Excel library did not load. Check your internet connection and reload.');return}
-  const list=items, ws=XLSX.utils.aoa_to_sheet([HEAD,...rowsOf(list)]);
-  list.forEach((i,n)=>{const c=ws[XLSX.utils.encode_cell({r:n+1,c:4})];if(c)c.l={Target:i.link}});
-  ws['!cols']=[{wch:5},{wch:20},{wch:20},{wch:24},{wch:60},{wch:12},{wch:36}];
-  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Job Links');
-  XLSX.writeFile(wb,'job-links-'+stamp()+'.xlsx');
-};
+        function fmtDate(ms) {
+            return new Date(ms).toLocaleString([], {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
+        }
 
-$('pdf').onclick=()=>{
-  if(!window.jspdf){say('PDF library did not load. Check your internet connection and reload.');return}
-  const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
-  doc.setFontSize(14);doc.text('Job Links - '+stamp(),40,36);
-  doc.autoTable({head:[HEAD],body:rowsOf(items),startY:48,styles:{fontSize:8,cellPadding:4,overflow:'linebreak'},
-    headStyles:{fillColor:[29,78,216]},
-    columnStyles:{0:{cellWidth:24},1:{cellWidth:80},2:{cellWidth:80},3:{cellWidth:90},4:{cellWidth:230},5:{cellWidth:52},6:{cellWidth:'auto'}},
-    didParseCell:d=>{if(d.section==='body'&&d.column.index===4)d.cell.styles.textColor=[29,78,216]},
-    didDrawCell:d=>{if(d.section==='body'&&d.column.index===4)doc.link(d.cell.x,d.cell.y,d.cell.width,d.cell.height,{url:items[d.row.index].link})}});
-  doc.save('job-links-'+stamp()+'.pdf');
-};
+        function left(i) {
+            const ms = i.added + TTL - Date.now();
+            if (ms <= 0) return 'expired';
+            const h = Math.floor(ms / 36e5),
+                m = Math.floor(ms % 36e5 / 6e4);
+            return h + 'h ' + String(m).padStart(2, '0') + 'm';
+        }
 
-$('clr').onclick=()=>{
-  if(confirm('Delete all saved links? Download them first if you need a copy.')){items=[];save();render()}
-};
+        $('f').addEventListener('submit', e => {
+            e.preventDefault();
+            const url = normUrl($('link').value);
+            if (!url) {
+                say('Enter a valid link, for example https://company.com/careers/role');
+                return
+            }
+            if (items.some(i => i.link === url)) {
+                say('This link is already saved.');
+                return
+            }
+            items.unshift({
+                id: Date.now() + Math.random().toString(36).slice(2, 6),
+                link: url,
+                company: $('company').value.trim() || guessCompany(url),
+                role: $('role').value.trim(),
+                notes: $('notes').value.trim(),
+                status: 'Saved',
+                added: Date.now()
+            });
+            save();
+            $('f').reset();
+            say('Link saved.', true);
+            render();
+            $('link').focus();
+        });
 
-render();
-setInterval(()=>{items=load();render()},30000);
-</script>
+        function visible() {
+            const q = $('q').value.trim().toLowerCase();
+            return q ? items.filter(i => [i.company, i.role, i.link, i.notes, i.status].join(' ').toLowerCase().includes(q)) : items;
+        }
+
+        function render() {
+            items = items.filter(i => i.added + TTL > Date.now());
+            const list = visible(),
+                tb = $('rows');
+            tb.textContent = '';
+            list.forEach((i, idx) => {
+                const tr = document.createElement('tr');
+                const cell = (t, cls) => {
+                    const td = document.createElement('td');
+                    if (cls) td.className = cls;
+                    td.textContent = t;
+                    tr.appendChild(td);
+                    return td
+                };
+                cell(idx + 1, 'n');
+                cell(fmtDate(i.added));
+                cell(i.company);
+                cell(i.role);
+                const lt = document.createElement('td'),
+                    a = document.createElement('a');
+                a.href = i.link;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.textContent = i.link;
+                lt.appendChild(a);
+                tr.appendChild(lt);
+                const st = document.createElement('td'),
+                    sel = document.createElement('select');
+                sel.setAttribute('aria-label', 'Status');
+                STATUSES.forEach(s => {
+                    const o = document.createElement('option');
+                    o.textContent = s;
+                    o.selected = s === i.status;
+                    sel.appendChild(o)
+                });
+                sel.onchange = () => {
+                    i.status = sel.value;
+                    save()
+                };
+                st.appendChild(sel);
+                tr.appendChild(st);
+                cell(i.notes);
+                const ex = cell(left(i), 'exp');
+                if (i.added + TTL - Date.now() < 6 * 36e5) ex.classList.add('soon');
+                const dt = document.createElement('td'),
+                    b = document.createElement('button');
+                b.textContent = 'Delete';
+                b.className = 'danger';
+                b.onclick = () => {
+                    items = items.filter(x => x.id !== i.id);
+                    save();
+                    render()
+                };
+                dt.appendChild(b);
+                tr.appendChild(dt);
+                tb.appendChild(tr);
+            });
+            $('empty').hidden = list.length > 0;
+            $('count').textContent = items.length + (items.length === 1 ? ' link saved' : ' links saved');
+            ['xl', 'pdf', 'clr'].forEach(id => $(id).disabled = !items.length);
+        }
+        $('q').addEventListener('input', render);
+
+        function stamp() {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
+        }
+        const HEAD = ['#', 'Date added', 'Company', 'Role', 'Link', 'Status', 'Notes'];
+
+        function rowsOf(list) {
+            return list.map((i, n) => [n + 1, fmtDate(i.added), i.company, i.role, i.link, i.status, i.notes])
+        }
+
+        $('xl').onclick = () => {
+            if (typeof XLSX === 'undefined') {
+                barSay('Excel library did not load. Check your internet connection and reload.');
+                return
+            }
+            try {
+                const list = items,
+                    ws = XLSX.utils.aoa_to_sheet([HEAD, ...rowsOf(list)]);
+                list.forEach((i, n) => {
+                    const c = ws[XLSX.utils.encode_cell({
+                        r: n + 1,
+                        c: 4
+                    })];
+                    if (c) c.l = {
+                        Target: i.link
+                    }
+                });
+                ws['!cols'] = [{
+                    wch: 5
+                }, {
+                    wch: 20
+                }, {
+                    wch: 20
+                }, {
+                    wch: 24
+                }, {
+                    wch: 60
+                }, {
+                    wch: 12
+                }, {
+                    wch: 36
+                }];
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Job Links');
+                XLSX.writeFile(wb, 'job-links-' + stamp() + '.xlsx');
+                barSay('Excel file downloaded.', true);
+            } catch (e) {
+                barSay('Excel export failed: ' + e.message)
+            }
+        };
+
+        /* ---- PDF export ---- */
+        function loadScript(src) {
+            return new Promise((res, rej) => {
+                const s = document.createElement('script');
+                s.src = src;
+                s.onload = res;
+                s.onerror = () => rej(new Error('Could not load ' + src));
+                document.head.appendChild(s);
+            });
+        }
+
+        function pdfReady() {
+            try {
+                return !!(window.jspdf && typeof new window.jspdf.jsPDF().autoTable === 'function')
+            } catch (e) {
+                return false
+            }
+        }
+        // If the first CDN was blocked or slow, retry from a second one before giving up.
+        async function ensurePdfLibs() {
+            if (pdfReady()) return;
+            if (!window.jspdf) await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
+            if (!pdfReady()) await loadScript('https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js');
+            if (!pdfReady()) throw new Error('PDF libraries did not load. Check your connection or ad-blocker and reload.');
+        }
+
+        function buildPdf(list) {
+            const doc = new window.jspdf.jsPDF({
+                orientation: 'landscape',
+                unit: 'pt',
+                format: 'a4'
+            });
+            doc.setFontSize(14);
+            doc.text('Job Links - ' + stamp(), 40, 36);
+            doc.autoTable({
+                head: [HEAD],
+                body: rowsOf(list),
+                startY: 48,
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 4,
+                    overflow: 'linebreak'
+                },
+                headStyles: {
+                    fillColor: [29, 78, 216]
+                },
+                columnStyles: {
+                    0: {
+                        cellWidth: 24
+                    },
+                    1: {
+                        cellWidth: 80
+                    },
+                    2: {
+                        cellWidth: 80
+                    },
+                    3: {
+                        cellWidth: 90
+                    },
+                    4: {
+                        cellWidth: 230
+                    },
+                    5: {
+                        cellWidth: 52
+                    },
+                    6: {
+                        cellWidth: 'auto'
+                    }
+                },
+                didParseCell: d => {
+                    if (d.section === 'body' && d.column.index === 4) d.cell.styles.textColor = [29, 78, 216]
+                },
+                didDrawCell: d => {
+                    if (d.section === 'body' && d.column.index === 4) doc.link(d.cell.x, d.cell.y, d.cell.width, d.cell.height, {
+                        url: list[d.row.index].link
+                    })
+                }
+            });
+            return doc;
+        }
+        // Phones: open the share sheet (Save to Files). Desktop: normal download. Always leaves a visible "Open PDF" link.
+        async function deliverPdf(doc, name) {
+            const blob = doc.output('blob');
+            const url = URL.createObjectURL(blob);
+            if (/iPhone|iPad|Android/i.test(navigator.userAgent) && navigator.canShare) {
+                try {
+                    const file = new File([blob], name, {
+                        type: 'application/pdf'
+                    });
+                    if (navigator.canShare({
+                            files: [file]
+                        })) {
+                        await navigator.share({
+                            files: [file],
+                            title: name
+                        });
+                        barSay('PDF ready.', true, url, 'Open PDF');
+                        return;
+                    }
+                } catch (e) {
+                    if (e && e.name === 'AbortError') {
+                        barSay('Share cancelled.', false, url, 'Open PDF');
+                        return
+                    }
+                }
+            }
+            try {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = name;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                barSay('PDF downloaded. If nothing happened,', true, url, 'open the PDF here');
+            } catch (e) {
+                window.open(url, '_blank');
+                barSay('PDF opened in a new tab.', true, url, 'Open PDF');
+            }
+        }
+        $('pdf').onclick = async() => {
+            const btn = $('pdf');
+            btn.disabled = true;
+            barSay('Preparing PDF...', true);
+            try {
+                await ensurePdfLibs();
+                const doc = buildPdf(items.slice());
+                await deliverPdf(doc, 'job-links-' + stamp() + '.pdf');
+            } catch (e) {
+                console.error(e);
+                barSay('PDF export failed: ' + (e && e.message ? e.message : e));
+            } finally {
+                btn.disabled = !items.length
+            }
+        };
+
+        $('clr').onclick = () => {
+            if (confirm('Delete all saved links? Download them first if you need a copy.')) {
+                items = [];
+                save();
+                render();
+                barSay('')
+            }
+        };
+
+        render();
+        setInterval(() => {
+            items = load();
+            render()
+        }, 30000);
+    </script>
 </body>
+
 </html>
